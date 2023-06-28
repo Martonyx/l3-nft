@@ -1,4 +1,4 @@
-export const L3_CONTRACT_ADDRESS = "0xdf8682B125AC9d8AaF0279FE788cbb0b0297b6dA";
+export const L3_CONTRACT_ADDRESS = "0x4015b16Bd747Da10A5ff5A5A2b0ACa936B57dA0A";
 
 export const L3_CONTRACT_ABI = [
   {
@@ -65,6 +65,44 @@ export const L3_CONTRACT_ABI = [
       },
     ],
     name: "ApprovalForAll",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "NFTBurned",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "NFTMinted",
     type: "event",
   },
   {
@@ -162,19 +200,6 @@ export const L3_CONTRACT_ABI = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "getAllMinters",
-    outputs: [
-      {
-        internalType: "address[]",
-        name: "",
-        type: "address[]",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [
       {
         internalType: "uint256",
@@ -194,19 +219,32 @@ export const L3_CONTRACT_ABI = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "getPrice",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
-        name: "",
+        name: "_user",
         type: "address",
       },
     ],
-    name: "hasMinted",
+    name: "getTicketCount",
     outputs: [
       {
-        internalType: "bool",
+        internalType: "uint256",
         name: "",
-        type: "bool",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -264,59 +302,12 @@ export const L3_CONTRACT_ABI = [
   },
   {
     inputs: [],
-    name: "mintingFee",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "name",
     outputs: [
       {
         internalType: "string",
         name: "",
         type: "string",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    name: "nfts",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "soulBound",
-        type: "bool",
-      },
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "string",
-        name: "svgImage",
-        type: "string",
-      },
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -349,19 +340,6 @@ export const L3_CONTRACT_ABI = [
         internalType: "address",
         name: "",
         type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "price",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
       },
     ],
     stateMutability: "view",

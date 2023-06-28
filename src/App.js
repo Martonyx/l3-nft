@@ -192,18 +192,34 @@ export default function Home() {
                 />
               </label>
             </div>
-            <button
-              className="bg-red-500 text-white px-4 py-2 rounded"
-              onClick={mintNFT}
-              disabled={isLoading || isInputEmpty}
-            >
-              {isLoading ? "Minting..." : "Mint NFT"}
-            </button>
+            <div className="flex justify-center items-center h-full">
+              <button
+                className="bg-red-500 text-white px-4 py-2 m-2 rounded"
+                onClick={mintNFT}
+                disabled={isLoading || isInputEmpty}
+              >
+                {isLoading ? "Minting..." : "Mint NFT"}
+              </button>
+              <button
+                className="bg-green-500 text-white px-4 py-2 m-2 rounded"
+                onClick={withdrawTokens}
+                // disabled={isLoading || isInputEmpty}
+              >
+                {isLoadingD ? "loading..." : "Withdraw"}
+              </button>
+            </div>
 
             {mintSuccess && (
               <>
                 <p className="text-green-500 mt-2">mint successful</p>
-                <button>view on opensea</button>
+                <a
+                  className="hover:text-green-700 font-bold"
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://testnets.opensea.io/assets/mumbai/0x4015b16bd747da10a5ff5a5a2b0aca936b57da0a"
+                >
+                  view on opensea
+                </a>
               </>
             )}
             {mintError && <p className="text-red-500 mt-2">{mintError}</p>}
