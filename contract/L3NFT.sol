@@ -5,43 +5,62 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract L3SoulBoundNFT is ERC721, Ownable {
+contract L3TicketNFT is ERC721, Ownable {
+    using Strings for uint256;
 
     struct NFT {
         bool soulBound;
         address owner;
-        uint256 tokenId;
     }
 
-    mapping(address => bool) public hasMinted;
-    mapping(uint256 => NFT) public nfts;
+    mapping(uint256 => NFT) private nfts;
+    mapping(address => uint256) private ticketCounts;
+    mapping(address => bool) private minters;
+    address[] private mintersArray;
+
     uint256 private currentTokenId;
     string private baseTokenURI;
-    uint256 public mintingFee;
+    uint256 private mintingFee;
 
-    constructor(string memory _baseTokenURI, uint256 _price) ERC721("L3SoulBoundNFT", "L3SBNFT") {
+    event NFTMinted(address indexed owner, uint256 indexed tokenId);
+    event NFTBurned(address indexed owner, uint256 indexed tokenId);
+
+    constructor(string memory _baseTokenURI, uint256 _price) ERC721("L3TicketNFT", "L3TNFT") {
         baseTokenURI = _baseTokenURI;
         mintingFee = _price;
     }
 
-    function mintNFT() payable external {
-        require(!hasMinted[msg.sender], "You have already minted an NFT");
-        require(msg.value >= mintingFee, "insufficient funds");
+    function mintNFT(uint256 _ticketCount) payable external {
+        require(_ticketCount > 0, "No tickets purchased");
+
+        uint256 totalPrice = mintingFee * _ticketCount;
+        require(msg.value >= totalPrice, "Insufficient funds");
 
         currentTokenId++;
-        _safeMint(msg.sender, currentTokenId);
 
-        NFT memory newNFT = NFT({
-            soulBound: true,
-            owner: msg.sender,
-            tokenId: currentTokenId
-        });
-        
+        for (uint256 i = 0; i < _ticketCount; i++) {
+            _safeMint(msg.sender, currentTokenId + i);
 
-        nfts[currentTokenId] = newNFT;
+            NFT memory newNFT = NFT({
+                soulBound: true,
+                owner: msg.sender
+            });
 
+            nfts[currentTokenId + i] = newNFT;
+            ticketCounts[msg.sender]++;
+        }
 
-        hasMinted[msg.sender] = true;
+        emit NFTMinted(msg.sender, currentTokenId);
+        currentTokenId += _ticketCount;
+
+        if (!minters[msg.sender]) {
+            minters[msg.sender] = true;
+            mintersArray.push(msg.sender);
+        }
+    }
+
+    function getTicketCount(address _user) external view returns (uint256) {
+        return ticketCounts[_user];
     }
 
     function setMintingFee(uint256 _fee) external onlyOwner {
@@ -49,20 +68,7 @@ contract L3SoulBoundNFT is ERC721, Ownable {
     }
 
     function isSoulBound(uint256 _tokenId) external view returns (bool) {
-        require(_exists(_tokenId), "NFT does not exist");
-        return nfts[_tokenId].soulBound;
-    }
-
-    function getAllMinters() external view returns (address[] memory) {
-        address[] memory minters = new address[](currentTokenId);
-        uint256 count = 0;
-        for (uint256 i = 1; i <= currentTokenId; i++) {
-            if (ownerOf(i) != address(0)) {
-                minters[count] = ownerOf(i);
-                count++;
-            }
-        }
-        return minters;
+        return _exists(_tokenId) && nfts[_tokenId].soulBound;
     }
 
     function setBaseTokenURI(string memory _baseTokenURI) external onlyOwner {
@@ -72,18 +78,7 @@ contract L3SoulBoundNFT is ERC721, Ownable {
     function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
         require(_exists(_tokenId), "NFT does not exist");
 
-        string memory tokenIdString = Strings.toString(_tokenId);
-        string memory json = string(
-            abi.encodePacked(
-                '{"image": "',
-                baseTokenURI,
-                '", "tokenId": "', tokenIdString, 
-                '",}'
-            )
-        );
-
-        return json;
-
+        return baseTokenURI;
     }
 
     function burn(uint256 _tokenId) external {
@@ -91,6 +86,8 @@ contract L3SoulBoundNFT is ERC721, Ownable {
         require(ownerOf(_tokenId) == msg.sender, "Only the owner can burn the NFT");
         _burn(_tokenId);
         delete nfts[_tokenId];
+
+        emit NFTBurned(msg.sender, _tokenId);
     }
 
     function transferFrom(
@@ -105,13 +102,28 @@ contract L3SoulBoundNFT is ERC721, Ownable {
     function withdraw() external onlyOwner {
         uint256 balance = address(this).balance;
         require(balance > 0, "Contract has no balance");
-        
         (bool success, ) = payable(owner()).call{value: balance}("");
         require(success, "Withdrawal failed");
     }
 
-    function price () view external returns (uint256) {
+    function getPrice() external view returns (uint256) {
         return mintingFee;
     }
 
+    function getMinters() external view returns (address[] memory) {
+        return mintersArray;
+    }
+
+    function getMostRecentNFTTokenId(address _user) external view returns (uint256) {
+        uint256 userTicketCount = ticketCounts[_user];
+        require(userTicketCount > 0, "User has no NFTs");
+
+        for (uint256 i = currentTokenId; i > 0; i--) {
+            if (nfts[i].owner == _user) {
+                return i;
+            }
+        }
+
+        revert("No recent NFT found for the user");
+    }
 }

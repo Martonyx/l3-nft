@@ -1,4 +1,4 @@
-export const L3_CONTRACT_ADDRESS = "0x4015b16Bd747Da10A5ff5A5A2b0ACa936B57dA0A";
+export const L3_CONTRACT_ADDRESS = "0x28b8BF4dF88baa2b02ba87Bd13Cc7911e5bbFb55";
 
 export const L3_CONTRACT_ABI = [
   {
@@ -220,6 +220,38 @@ export const L3_CONTRACT_ABI = [
   },
   {
     inputs: [],
+    name: "getMinters",
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "",
+        type: "address[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_user",
+        type: "address",
+      },
+    ],
+    name: "getMostRecentNFTTokenId",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "getPrice",
     outputs: [
       {
@@ -294,7 +326,13 @@ export const L3_CONTRACT_ABI = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_ticketCount",
+        type: "uint256",
+      },
+    ],
     name: "mintNFT",
     outputs: [],
     stateMutability: "payable",
