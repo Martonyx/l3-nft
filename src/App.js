@@ -39,7 +39,7 @@ export default function Home() {
       await window.ethereum.enable();
       setWalletConnected(true);
       await getSignerAddress();
-      // getOwner();
+
       setIsLoadingB(false);
     } catch (error) {
       console.log(error);
@@ -114,19 +114,6 @@ export default function Home() {
       setIsLoadingD(false);
     }
   };
-
-  // const getOwner = async () => {
-  //   const provider = new ethers.providers.Web3Provider(window.ethereum);
-  //   const signer = provider.getSigner();
-  //   const L3Contract = new ethers.Contract(
-  //     L3_CONTRACT_ADDRESS,
-  //     L3_CONTRACT_ABI,
-  //     signer
-  //   );
-  //   const ownerAcc = await L3Contract.owner();
-
-  //   setOwner(ownerAcc === signer.address);
-  // };
 
   useEffect(() => {
     // Check if the user has an Ethereum-enabled browser
