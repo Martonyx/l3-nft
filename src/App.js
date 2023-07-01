@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { L3_CONTRACT_ADDRESS, L3_CONTRACT_ABI } from "./constants";
 
 export default function Home() {
@@ -16,6 +16,7 @@ export default function Home() {
   const [withdrawSuccess, setWithdrawSuccess] = useState(false);
   const [latestTokenId, setLatestTokenId] = useState("");
   const [owner, setOwner] = useState(null);
+  const [price, setPrice] = useState(0);
 
   const isInputEmpty = depositAmount === "";
 
@@ -57,10 +58,10 @@ export default function Home() {
         signer
       );
 
-      const divide_ = depositAmount / 100;
+      const priceToBuy = depositAmount * price;
 
       const transaction = await L3Contract.mintNFT(depositAmount, {
-        value: ethers.utils.parseEther(divide_.toString()),
+        value: ethers.utils.parseEther(priceToBuy.toString()),
       });
       await transaction.wait();
       tokenId();
@@ -128,7 +129,7 @@ export default function Home() {
         if (network.chainId === 80001) {
           setIsMumbaiNetwork(true);
         } else {
-          window.alert("change to shardeum network");
+          window.alert("change to Mumbai network");
         }
       };
 
@@ -141,8 +142,12 @@ export default function Home() {
           signer
         );
         const ownerAcc = await L3Contract.owner();
+        const _price = await L3Contract.getPrice();
+        const __price =
+          BigNumber.from(_price) / BigNumber.from(1000000000000000000n);
 
         setOwner(ownerAcc);
+        setPrice(__price);
       };
 
       const handleAccountsChanged = (accounts) => {
@@ -256,7 +261,9 @@ export default function Home() {
                     </div>
                     <div className="mb-4">
                       <label className="inline-flex items-center flex-col">
-                        <p className="text-lg mb-4">Mint Fee : 0.01 MATIC </p>
+                        <p className="text-lg mb-4">
+                          Mint Fee : {price.toString()} MATIC{" "}
+                        </p>
                         <input
                           value={depositAmount}
                           type="Number"
