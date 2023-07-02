@@ -1,4 +1,4 @@
-export const L3_CONTRACT_ADDRESS = "0x28b8BF4dF88baa2b02ba87Bd13Cc7911e5bbFb55";
+export const L3_CONTRACT_ADDRESS = "0x35714F2F2652F390e250fC61aD197C39f857A1c7";
 
 export const L3_CONTRACT_ABI = [
   {
@@ -272,6 +272,32 @@ export const L3_CONTRACT_ABI = [
       },
     ],
     name: "getTicketCount",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getTotalNFTs",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getTotalTickets",
     outputs: [
       {
         internalType: "uint256",

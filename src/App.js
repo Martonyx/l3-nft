@@ -316,7 +316,7 @@ export default function Home() {
             className="hover:text-red-500 text-2xl font-bold"
             target="_blank"
             rel="noreferrer"
-            href={`https://testnets.opensea.io/assets/mumbai/0x28b8BF4dF88baa2b02ba87Bd13Cc7911e5bbFb55/${latestTokenId}`}
+            href={`https://testnets.opensea.io/assets/mumbai/0x35714F2F2652F390e250fC61aD197C39f857A1c7/${latestTokenId}`}
           >
             view on opensea
           </a>

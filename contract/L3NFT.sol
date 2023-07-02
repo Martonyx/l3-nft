@@ -22,6 +22,10 @@ contract L3TicketNFT is ERC721, Ownable {
     string private baseTokenURI;
     uint256 private mintingFee;
 
+    uint256 private totalNFTs;
+    uint256 private totalTickets;
+
+
     event NFTMinted(address indexed owner, uint256 indexed tokenId);
     event NFTBurned(address indexed owner, uint256 indexed tokenId);
 
@@ -38,20 +42,21 @@ contract L3TicketNFT is ERC721, Ownable {
 
         currentTokenId++;
 
-        for (uint256 i = 0; i < _ticketCount; i++) {
-            _safeMint(msg.sender, currentTokenId + i);
+        _safeMint(msg.sender, currentTokenId);
 
-            NFT memory newNFT = NFT({
-                soulBound: true,
-                owner: msg.sender
-            });
+        NFT memory newNFT = NFT({
+            soulBound: true,
+            owner: msg.sender
+        });
 
-            nfts[currentTokenId + i] = newNFT;
-            ticketCounts[msg.sender]++;
-        }
+        nfts[currentTokenId] = newNFT;
+        totalNFTs++;
+
+        ticketCounts[msg.sender] += _ticketCount;
+        totalTickets += _ticketCount;
 
         emit NFTMinted(msg.sender, currentTokenId);
-        currentTokenId += _ticketCount;
+        currentTokenId++;
 
         if (!minters[msg.sender]) {
             minters[msg.sender] = true;
@@ -59,26 +64,12 @@ contract L3TicketNFT is ERC721, Ownable {
         }
     }
 
-    function getTicketCount(address _user) external view returns (uint256) {
-        return ticketCounts[_user];
-    }
-
     function setMintingFee(uint256 _fee) external onlyOwner {
         mintingFee = _fee;
     }
 
-    function isSoulBound(uint256 _tokenId) external view returns (bool) {
-        return _exists(_tokenId) && nfts[_tokenId].soulBound;
-    }
-
     function setBaseTokenURI(string memory _baseTokenURI) external onlyOwner {
         baseTokenURI = _baseTokenURI;
-    }
-
-    function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
-        require(_exists(_tokenId), "NFT does not exist");
-
-        return baseTokenURI;
     }
 
     function burn(uint256 _tokenId) external {
@@ -106,14 +97,6 @@ contract L3TicketNFT is ERC721, Ownable {
         require(success, "Withdrawal failed");
     }
 
-    function getPrice() external view returns (uint256) {
-        return mintingFee;
-    }
-
-    function getMinters() external view returns (address[] memory) {
-        return mintersArray;
-    }
-
     function getMostRecentNFTTokenId(address _user) external view returns (uint256) {
         uint256 userTicketCount = ticketCounts[_user];
         require(userTicketCount > 0, "User has no NFTs");
@@ -125,5 +108,35 @@ contract L3TicketNFT is ERC721, Ownable {
         }
 
         revert("No recent NFT found for the user");
+    }
+
+    function isSoulBound(uint256 _tokenId) external view returns (bool) {
+        return _exists(_tokenId) && nfts[_tokenId].soulBound;
+    }
+
+    function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
+        require(_exists(_tokenId), "NFT does not exist");
+
+        return baseTokenURI;
+    }
+    
+    function getTicketCount(address _user) external view returns (uint256) {
+        return ticketCounts[_user];
+    }
+
+    function getPrice() external view returns (uint256) {
+        return mintingFee;
+    }
+
+    function getMinters() external view returns (address[] memory) {
+        return mintersArray;
+    }
+
+    function getTotalTickets() external view returns (uint256) {
+        return totalTickets;
+    }
+
+    function getTotalNFTs() external view returns (uint256) {
+        return totalNFTs;
     }
 }
