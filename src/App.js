@@ -17,6 +17,8 @@ export default function Home() {
   const [latestTokenId, setLatestTokenId] = useState("");
   const [owner, setOwner] = useState(null);
   const [price, setPrice] = useState(0);
+  const [L3Contract, setL3Contract] = useState(null);
+  const [isPriceLoading, setIsPriceLoading] = useState(false);
 
   const isInputEmpty = depositAmount === "";
 
@@ -50,13 +52,6 @@ export default function Home() {
   const mintNFT = async () => {
     try {
       setIsLoading(true);
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const L3Contract = new ethers.Contract(
-        L3_CONTRACT_ADDRESS,
-        L3_CONTRACT_ABI,
-        signer
-      );
 
       const priceToBuy = depositAmount * price;
 
@@ -78,14 +73,6 @@ export default function Home() {
 
   const tokenId = async () => {
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const L3Contract = new ethers.Contract(
-        L3_CONTRACT_ADDRESS,
-        L3_CONTRACT_ABI,
-        signer
-      );
-
       const tx = await L3Contract.getMostRecentNFTTokenId(signerAddress);
       setLatestTokenId(tx);
     } catch (error) {
@@ -96,13 +83,7 @@ export default function Home() {
   const withdrawTokens = async () => {
     try {
       setIsLoadingD(true);
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const L3Contract = new ethers.Contract(
-        L3_CONTRACT_ADDRESS,
-        L3_CONTRACT_ABI,
-        signer
-      );
+
       const tx = await L3Contract.withdraw();
       await tx.wait();
       setWithdrawSuccess(true);
@@ -141,11 +122,15 @@ export default function Home() {
           L3_CONTRACT_ABI,
           signer
         );
+
+        setL3Contract(L3Contract);
+        setIsPriceLoading(true);
         const ownerAcc = await L3Contract.owner();
         const _price = await L3Contract.getPrice();
         const __price =
           BigNumber.from(_price) / BigNumber.from(1000000000000000000n);
 
+        setIsPriceLoading(false);
         setOwner(ownerAcc);
         setPrice(__price);
       };
@@ -262,7 +247,10 @@ export default function Home() {
                     <div className="mb-4">
                       <label className="inline-flex items-center flex-col">
                         <p className="text-lg mb-4">
-                          Mint Fee : {price.toString()} MATIC{" "}
+                          Mint Fee :{" "}
+                          {isPriceLoading
+                            ? "please wait..."
+                            : price.toString() + " MATIC"}
                         </p>
                         <input
                           value={depositAmount}
